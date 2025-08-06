@@ -1,60 +1,17 @@
 //
-//  ContentView.swift
+//  BootUpViewModel.swift
 //  BootUp
 //
 //  Created by Jacob Kelly on 8/5/25.
 //
 
-
-import SwiftUI
 import Foundation
 import Network
 
+class BootUpViewModel: ObservableObject {
+    @Published var statusMessage: String = ""
 
-struct ContentView: View {
-    @State private var macAddress: String = ""
-    @State private var broadcastIP: String = ""
-    @State private var statusMessage: String = ""
-
-    var body: some View {
-        VStack {
-
-            Text("BootUp")
-                .font(.title)
-
-            TextField(" Enter MAC address", text: $macAddress)
-                .textInputAutocapitalization(.characters)
-                .disableAutocorrection(true)
-                .border(.tertiary)
-                .textFieldStyle(.roundedBorder)
-
-            TextField(" Enter broadcast IP", text: $broadcastIP)
-                .textInputAutocapitalization(.never)
-                .disableAutocorrection(true)
-                .border(.tertiary)
-                .textFieldStyle(.roundedBorder)
-
-            HStack {
-                Button("Start PC", systemImage: "power"){
-                    StartPC(macAddress: macAddress, broadcastIP: broadcastIP)
-                    print("Hello")
-                }
-                    .labelStyle(.iconOnly)
-                    .padding()
-
-                Button("Login", systemImage: "play", action: Logon)
-                    .labelStyle(.iconOnly)
-                    .padding()
-            }
-
-            Text(statusMessage)
-                .foregroundColor(.gray)
-               .padding()
-        }
-        .padding()
-    }
-
-    func StartPC(macAddress: String, broadcastIP: String) {
+    func bootDevice(macAddress: String, broadcastIP: String) {
         guard let packet = buildWOLPacket(mac: macAddress) else {
             statusMessage = "Invalid MAC Address format"
             return
@@ -74,14 +31,14 @@ struct ContentView: View {
             case .ready:
                 connection.send(content: packet, completion: .contentProcessed { error in
                     if let error = error {
-                        statusMessage = "Send failed: \(error.localizedDescription)"
+                        self.statusMessage = "Send failed: \(error.localizedDescription)"
                     } else {
-                        statusMessage = "WOL packet sent successfully!"
+                        self.statusMessage = "WOL packet sent successfully!"
                     }
                     connection.cancel()
                 })
             case .failed(let error):
-                statusMessage = "Connection failed: \(error.localizedDescription)"
+                self.statusMessage = "Connection failed: \(error.localizedDescription)"
                 connection.cancel()
             default:
                 break
@@ -91,9 +48,11 @@ struct ContentView: View {
         connection.start(queue: .global())
     }
 
-    func Logon() {
+    
+    func logonToDevice() {
         
     }
+
 
     func buildWOLPacket(mac: String) -> Data? {
          let cleaned = mac.replacingOccurrences(of: "[:-]", with: "", options: .regularExpression)
@@ -113,8 +72,4 @@ struct ContentView: View {
 
          return Data(packet)
      }
-}
-
-#Preview {
-    ContentView()
 }
