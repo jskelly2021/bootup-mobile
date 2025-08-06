@@ -13,16 +13,19 @@ struct DeviceDetailsView: View {
 
     @State private var isCanceled: Bool = false
 
-    @Binding var selectedDevice: Device
+    let device: Device
+    let onSave: (String, String, String) -> Void
+
     @State private var deviceName: String
     @State private var macAddress: String
     @State private var broadcastIP: String
 
-    init(device: Device) {
-        device = device
-        deviceName = device.name
-        macAddress = device.macAddress
-        broadcastIP = device.broadcastIP
+    init(device: Device, onSave: @escaping (String, String, String) -> Void) {
+        self.device = device
+        self.onSave = onSave
+        self._deviceName = State(initialValue: device.name)
+        self._macAddress = State(initialValue: device.macAddress)
+        self._broadcastIP = State(initialValue: device.broadcastIP)
     }
 
     var body: some View {
@@ -60,7 +63,7 @@ struct DeviceDetailsView: View {
         .onChange(of: editMode?.wrappedValue) {
             if editMode?.wrappedValue == .inactive && !isCanceled {
                 isCanceled = false
-                
+                onSave(deviceName, macAddress, broadcastIP)
             }
         }
     }
@@ -90,5 +93,10 @@ struct DeviceDetailsView: View {
 
 #Preview {
     let device = Device(name: "j2pc", macAddress: "AA:AA:AA:AA:AA:AA", broadcastIP: "192.168.1.255")
-    DeviceDetailsView(device: device)
+    DeviceDetailsView(
+        device: device,
+        onSave: { name, mac, ip in
+            print("Saved device: " + name)
+        }
+    )
 }

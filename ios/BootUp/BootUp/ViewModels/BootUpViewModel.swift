@@ -45,6 +45,7 @@ class BootUpViewModel: ObservableObject {
             return
         }
         dataService.updateDevice(device: device, name: macAddress, macAddress: macAddress, broadcastIP: broadcastIP)
+        fetchDevices()
     }
 
     func selectDevice(_ device: Device?) {
