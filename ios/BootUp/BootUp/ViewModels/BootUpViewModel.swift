@@ -8,13 +8,14 @@
 import Foundation
 import SwiftData
 import Network
+import SwiftUI
 
 class BootUpViewModel: ObservableObject {
     private let dataService: DataService
     @Published var statusMessage: String = ""
     @Published var selectedDevice: Device?
 
-    var devices: [Device] = []
+    @Published var devices: [Device] = []
 
     init(dataService: DataService = .shared) {
         self.dataService = dataService
@@ -42,6 +43,9 @@ class BootUpViewModel: ObservableObject {
         dataService.updateDevice(device: device, name: macAddress, macAddress: macAddress, broadcastIP: broadcastIP)
     }
 
+    func selectDevice(_ device: Device?) {
+        selectedDevice = device
+    }
 
     func bootDevice(macAddress: String, broadcastIP: String) {
         guard let packet = WakeOnLanService.buildWOLPacket(mac: macAddress) else {

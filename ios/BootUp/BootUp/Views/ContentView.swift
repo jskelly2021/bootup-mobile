@@ -11,20 +11,17 @@ import Foundation
 
 struct ContentView: View {
     @StateObject private var viewModel = BootUpViewModel()
+    @State private var path = NavigationPath()
 
     @State private var deviceName: String = ""
     @State private var macAddress: String = ""
     @State private var broadcastIP: String = ""
     
     var body: some View {
-        NavigationView {
+        NavigationStack(path: $path) {
             VStack {
-                
-                Text("BootUp")
-                    .font(.largeTitle)
-                
                 TextField("Device Name", text: $deviceName)
-                    .textInputAutocapitalization(.characters)
+                    .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
                     .border(.tertiary)
                     .textFieldStyle(.roundedBorder)
@@ -40,20 +37,8 @@ struct ContentView: View {
                     .disableAutocorrection(true)
                     .border(.tertiary)
                     .textFieldStyle(.roundedBorder)
-
-                Button("Add Device") {
-                    viewModel.addDevice(name: deviceName, macAddress: macAddress, broadcastIP: broadcastIP)
-                }
-
-                Picker("Select Device", selection: $viewModel.selectedDevice) {
-                    ForEach(viewModel.devices, id: \.id) { device in
-                        VStack(alignment: .leading) {
-                            Text(device.name).tag(device as Device?)
-                        }
-                    }
-                    
-                }
-                .pickerStyle(.menu)
+                
+                DeviceListView()
 
                 HStack {
                     Button("Start PC", systemImage: "power") {
@@ -61,7 +46,7 @@ struct ContentView: View {
                     }
                     .labelStyle(.iconOnly)
                     .padding()
-                    
+
                     Button("Login", systemImage: "play", action: viewModel.logonToDevice)
                         .labelStyle(.iconOnly)
                         .padding()
@@ -71,6 +56,7 @@ struct ContentView: View {
                     .foregroundColor(.gray)
                     .padding()
             }
+            .navigationTitle("BootUp")
             .padding()
         }
     }
