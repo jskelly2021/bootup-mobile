@@ -12,10 +12,10 @@ struct DeviceDetailsView: View {
     @Environment(\.editMode) var editMode
     @Environment(\.dismiss) var dismiss
 
-    @State private var deviceName: String = ""
-    @State private var macAddress: String = ""
-    @State private var broadcastIP: String = ""
-    
+    @State private var deviceName: String
+    @State private var macAddress: String
+    @State private var broadcastIP: String
+
     init(device: Device?) {
         deviceName = device?.name ?? ""
         macAddress = device?.macAddress ?? ""
@@ -33,14 +33,15 @@ struct DeviceDetailsView: View {
                 Spacer()
                 EditButton()
             }
+            .padding(.horizontal)
 
             Form {
                 Section(header: Text("Device Info")) {
                     if editMode?.wrappedValue == .active {
-                        customTextField(placeHolder: "Enter device name", text: $deviceName)
-                        customTextField(placeHolder: "Enter MAC address", text: $macAddress)
+                        customTextField(detail: "Device Name", placeHolder: "Enter device name", text: $deviceName)
+                        customTextField(detail: "MAC Address", placeHolder: "Enter MAC address", text: $macAddress)
                             .textInputAutocapitalization(.characters)
-                        customTextField(placeHolder: "Enter broadcast IP", text: $broadcastIP)
+                        customTextField(detail: "Broadcast IP", placeHolder: "Enter broadcast IP", text: $broadcastIP)
                             .keyboardType(.numbersAndPunctuation)
                     }
                     else {
@@ -50,29 +51,35 @@ struct DeviceDetailsView: View {
                     }
                 }
             }
+            .frame(width: .infinity)
         }
         .onChange(of: editMode?.wrappedValue) {
             if editMode?.wrappedValue == .inactive {
                 print("done editing")
             }
         }
-        .padding()
     }
 
     private func deviceDetail(detail: String, value: String) -> some View {
         HStack {
-            Text(detail + ": ")
+            Text(detail)
                 .font(.headline)
+            Spacer()
             Text(value)
+                .foregroundStyle(.secondary)
         }
     }
 
-    private func customTextField(placeHolder: String, text: Binding<String>) -> some View {
-        TextField(placeHolder, text: text)
-            .textInputAutocapitalization(.never)
-            .disableAutocorrection(true)
-            .border(.tertiary)
-            .textFieldStyle(.roundedBorder)
+    private func customTextField(detail: String, placeHolder: String, text: Binding<String>) -> some View {
+        HStack {
+            Text(detail)
+                .font(.headline)
+            Spacer()
+            TextField(placeHolder, text: text)
+                .textInputAutocapitalization(.never)
+                .disableAutocorrection(true)
+                .multilineTextAlignment(.trailing)
+        }
     }
 }
 
