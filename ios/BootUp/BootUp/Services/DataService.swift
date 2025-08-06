@@ -34,7 +34,7 @@ class DataService {
         }
     }
 
-    func retrieveDevices() throws -> [Device] {
+    func retrieveDevices() -> [Device] {
         do {
             let descriptor = FetchDescriptor<Device>(sortBy: [SortDescriptor(\.name)])
             return try context.fetch(descriptor)

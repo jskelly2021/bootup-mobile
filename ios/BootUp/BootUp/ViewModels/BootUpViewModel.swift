@@ -10,7 +10,36 @@ import SwiftData
 import Network
 
 class BootUpViewModel: ObservableObject {
+    private let dataService: DataService
     @Published var statusMessage: String = ""
+
+    var devices: [Device] = []
+
+    init(dataService: DataService = .shared) {
+        self.dataService = dataService
+    }
+
+    func fetchDevices() {
+        devices = dataService.retrieveDevices()
+    }
+
+    func addDevice(name: String, macAddress: String, broadcastIP: String) {
+        dataService.createDevice(name: name, macAddress: macAddress, broadcastIP: broadcastIP)
+        fetchDevices()
+    }
+
+    func deleteDevice(at offsets: IndexSet) {
+        for index in offsets {
+            let device = devices[index]
+            dataService.deleteDevice(device: device)
+        }
+        fetchDevices()
+    }
+
+    func editDevice(device: Device, name: String, macAddress: String, broadcastIP: String) {
+        dataService.updateDevice(device: device, name: macAddress, macAddress: macAddress, broadcastIP: broadcastIP)
+    }
+
 
     func bootDevice(macAddress: String, broadcastIP: String) {
         guard let packet = WakeOnLanService.buildWOLPacket(mac: macAddress) else {
@@ -49,7 +78,7 @@ class BootUpViewModel: ObservableObject {
         connection.start(queue: .global())
     }
 
-
+    
     func logonToDevice() {
         
     }
