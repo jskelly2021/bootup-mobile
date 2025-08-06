@@ -40,7 +40,10 @@ struct ContentView: View {
                     case .deviceDetails:
                         if let device = viewModel.selectedDevice {
                             DeviceDetailsView(device: device) { name, mac, ip in
+                                print(name)
                                 viewModel.editDevice(name: name, macAddress: mac, broadcastIP: ip)
+                            } onDelete: { device in
+                                viewModel.deleteDevice(device)
                             }
                         } else {
                             Text("No device selected")
@@ -48,6 +51,9 @@ struct ContentView: View {
                     case .deviceList:
                         DeviceListView(devices: viewModel.devices) { device in
                             viewModel.selectDevice(device)
+                        } onAddDevice: {
+                            let newDevice = viewModel.addNewDevice()
+                            viewModel.selectDevice(newDevice)
                         }
                 }
             }

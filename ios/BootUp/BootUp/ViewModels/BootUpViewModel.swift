@@ -21,10 +21,6 @@ class BootUpViewModel: ObservableObject {
     init(dataService: DataService = .shared) {
         self.dataService = dataService
         fetchDevices()
-    }
-
-    func fetchDevices() {
-        devices = dataService.retrieveDevices()
 
         if let savedID = UserDefaults.standard.string(forKey: selectedDeviceKey),
            let restoredDevice = devices.first(where: { $0.id.uuidString == savedID }) {
@@ -32,17 +28,23 @@ class BootUpViewModel: ObservableObject {
         }
     }
 
-    func addDevice(name: String, macAddress: String, broadcastIP: String) {
-        dataService.createDevice(name: name, macAddress: macAddress, broadcastIP: broadcastIP)
-        fetchDevices()
+    func fetchDevices() {
+        devices = dataService.retrieveDevices()
     }
 
-    func deleteDevice(at offsets: IndexSet) {
-        for index in offsets {
-            let device = devices[index]
-            dataService.deleteDevice(device: device)
-        }
+    func addNewDevice() -> Device {
+        let newDevice: Device = dataService.createDevice(name: "New device", macAddress: "", broadcastIP: "")
         fetchDevices()
+        return newDevice
+    }
+
+    func deleteDevice(_ device: Device) {
+        dataService.deleteDevice(device: device)
+        fetchDevices()
+
+        if selectedDevice?.id == device.id {
+            selectDevice(nil)
+        }
     }
 
     func editDevice(name: String, macAddress: String, broadcastIP: String) {

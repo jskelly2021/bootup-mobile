@@ -10,26 +10,29 @@ import SwiftUI
 
 struct DeviceDetailsView: View {
     @Environment(\.editMode) var editMode
+    @Environment(\.dismiss) var dismiss
 
     @State private var isCanceled: Bool = false
 
     let device: Device
     let onSave: (String, String, String) -> Void
+    let onDelete: (Device) -> Void
 
     @State private var deviceName: String
     @State private var macAddress: String
     @State private var broadcastIP: String
 
-    init(device: Device, onSave: @escaping (String, String, String) -> Void) {
+    init(device: Device, onSave: @escaping (String, String, String) -> Void, onDelete: @escaping (Device) -> Void) {
         self.device = device
         self.onSave = onSave
+        self.onDelete = onDelete
         self._deviceName = State(initialValue: device.name)
         self._macAddress = State(initialValue: device.macAddress)
         self._broadcastIP = State(initialValue: device.broadcastIP)
     }
 
     var body: some View {
-        VStack (alignment: .leading) {
+        VStack {
             HStack {
                 if editMode?.wrappedValue == .active {
                     Button("Cancel", role: .cancel) {
@@ -59,6 +62,13 @@ struct DeviceDetailsView: View {
                 }
             }
             .frame(width: .infinity)
+
+            Button("delete", systemImage: "trash") {
+                onDelete(device)
+                dismiss()
+            }
+            .labelStyle(.iconOnly)
+
         }
         .onChange(of: editMode?.wrappedValue) {
             if editMode?.wrappedValue == .inactive && !isCanceled {
@@ -97,6 +107,9 @@ struct DeviceDetailsView: View {
         device: device,
         onSave: { name, mac, ip in
             print("Saved device: " + name)
+        },
+        onDelete:{ device in
+            print("deleted device: " + device.name)
         }
     )
 }

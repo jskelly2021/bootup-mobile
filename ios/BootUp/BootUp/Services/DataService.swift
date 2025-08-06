@@ -23,7 +23,7 @@ class DataService {
         }
     }
 
-    func createDevice(name: String, macAddress: String, broadcastIP: String) {
+    func createDevice(name: String, macAddress: String, broadcastIP: String) -> Device {
         let newDevice = Device(name: name, macAddress: macAddress, broadcastIP: broadcastIP)
         context.insert(newDevice)
 
@@ -32,6 +32,7 @@ class DataService {
         } catch {
             print("Failed to save device: \(error)")
         }
+        return newDevice
     }
 
     func retrieveDevices() -> [Device] {

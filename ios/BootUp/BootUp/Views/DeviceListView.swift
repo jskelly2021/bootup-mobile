@@ -13,10 +13,12 @@ struct DeviceListView: View {
 
     let devices: [Device]
     let onSelect: (Device) -> Void
+    let onAddDevice: () -> Void
 
-    init(devices: [Device], onSelect: @escaping (Device) -> Void) {
+    init(devices: [Device], onSelect: @escaping (Device) -> Void, onAddDevice: @escaping () -> Void) {
         self.devices = devices
         self.onSelect = onSelect
+        self.onAddDevice = onAddDevice
     }
 
     var body: some View {
@@ -26,6 +28,7 @@ struct DeviceListView: View {
                     VStack {
                         Button {
                             onSelect(device)
+                            dismiss()
                         } label: {
                             DeviceListItemView(device: device)
                         }
@@ -44,7 +47,8 @@ struct DeviceListView: View {
 
     private func newDeviceButton() -> some View {
         Button("New Device", systemImage: "plus.circle") {
-            print("New Device")
+            onAddDevice()
+            dismiss()
         }
         .labelStyle(.iconOnly)
     }
@@ -61,5 +65,8 @@ struct DeviceListView: View {
         devices: devices,
         onSelect: { device in
             print("Selected: " + device.name)
+        },
+        onAddDevice: {
+            print("Added device")
         })
 }
