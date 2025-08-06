@@ -10,16 +10,19 @@ import SwiftUI
 
 struct DeviceDetailsView: View {
     @Environment(\.editMode) var editMode
-    @Environment(\.dismiss) var dismiss
 
+    @State private var isCanceled: Bool = false
+
+    @Binding var selectedDevice: Device
     @State private var deviceName: String
     @State private var macAddress: String
     @State private var broadcastIP: String
 
-    init(device: Device?) {
-        deviceName = device?.name ?? ""
-        macAddress = device?.macAddress ?? ""
-        broadcastIP = device?.broadcastIP ?? ""
+    init(device: Device) {
+        device = device
+        deviceName = device.name
+        macAddress = device.macAddress
+        broadcastIP = device.broadcastIP
     }
 
     var body: some View {
@@ -27,6 +30,7 @@ struct DeviceDetailsView: View {
             HStack {
                 if editMode?.wrappedValue == .active {
                     Button("Cancel", role: .cancel) {
+                        isCanceled = true
                         editMode?.animation().wrappedValue = .inactive
                     }
                 }
@@ -54,8 +58,9 @@ struct DeviceDetailsView: View {
             .frame(width: .infinity)
         }
         .onChange(of: editMode?.wrappedValue) {
-            if editMode?.wrappedValue == .inactive {
-                print("done editing")
+            if editMode?.wrappedValue == .inactive && !isCanceled {
+                isCanceled = false
+                
             }
         }
     }
