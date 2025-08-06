@@ -12,11 +12,13 @@ import Network
 class BootUpViewModel: ObservableObject {
     private let dataService: DataService
     @Published var statusMessage: String = ""
+    @Published var selectedDevice: Device?
 
     var devices: [Device] = []
 
     init(dataService: DataService = .shared) {
         self.dataService = dataService
+        fetchDevices()
     }
 
     func fetchDevices() {
