@@ -39,7 +39,11 @@ class BootUpViewModel: ObservableObject {
         fetchDevices()
     }
 
-    func editDevice(device: Device, name: String, macAddress: String, broadcastIP: String) {
+    func editDevice(name: String, macAddress: String, broadcastIP: String) {
+        guard let device = selectedDevice else {
+            print("No device selected")
+            return
+        }
         dataService.updateDevice(device: device, name: macAddress, macAddress: macAddress, broadcastIP: broadcastIP)
     }
 
@@ -47,13 +51,18 @@ class BootUpViewModel: ObservableObject {
         selectedDevice = device
     }
 
-    func bootDevice(macAddress: String, broadcastIP: String) {
-        guard let packet = WakeOnLanService.buildWOLPacket(mac: macAddress) else {
+    func bootDevice() {
+        guard let device = selectedDevice else {
+            statusMessage = "No device selected"
+            return
+        }
+        
+        guard let packet = WakeOnLanService.buildWOLPacket(mac: device.macAddress) else {
             statusMessage = "Invalid MAC Address format"
             return
         }
 
-        guard let ip = IPv4Address(broadcastIP) else {
+        guard let ip = IPv4Address(device.broadcastIP) else {
             statusMessage = "Invalid IP address"
             return
         }
