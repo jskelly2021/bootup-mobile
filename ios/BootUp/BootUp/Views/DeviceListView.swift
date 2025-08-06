@@ -9,26 +9,37 @@ import Foundation
 import SwiftUI
 
 struct DeviceListView: View {
-    @StateObject private var viewModel = BootUpViewModel()
+    @Environment(\.dismiss) var dismiss
+
+    let devices: [Device]
+    let onSelect: (Device) -> Void
+
+    init(devices: [Device], onSelect: @escaping (Device) -> Void) {
+        self.devices = devices
+        self.onSelect = onSelect
+    }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-                    ForEach(viewModel.devices, id: \.id) { device in
-                        VStack(alignment: .leading) {
-                            Text(device.name)
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+                ForEach(devices, id: \.id) { device in
+                    VStack {
+                        Button {
+                            onSelect(device)
+                        } label: {
+                            DeviceListItemView(device: device)
                         }
                     }
                 }
             }
-            .navigationTitle("Devices")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    newDeviceButton()
-                }
+        }
+        .navigationTitle("Devices")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                newDeviceButton()
             }
         }
+        .padding(.horizontal)
     }
 
     private func newDeviceButton() -> some View {
@@ -40,5 +51,15 @@ struct DeviceListView: View {
 }
 
 #Preview {
-    DeviceListView()
+    let devices = [
+        Device(name: "j2pc", macAddress: "AA:AA:AA:AA:AA:AA", broadcastIP: "192.168.1.255"),
+        Device(name: "Macbook", macAddress: "AA:AA:AA:AA:AA:AA", broadcastIP: "192.168.1.255"),
+        Device(name: "j3pc", macAddress: "AA:AA:AA:AA:AA:AA", broadcastIP: "192.168.1.255")
+    ]
+
+    DeviceListView(
+        devices: devices,
+        onSelect: { device in
+            print("Selected: " + device.name)
+        })
 }

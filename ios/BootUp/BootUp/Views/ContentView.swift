@@ -11,6 +11,7 @@ import Foundation
 
 enum AppRoute: Hashable {
     case deviceDetails
+    case deviceList
 }
 
 struct ContentView: View {
@@ -33,9 +34,7 @@ struct ContentView: View {
                 Text(viewModel.statusMessage)
                     .foregroundColor(.gray)
                     .padding()
-
             }
-            .navigationTitle(viewModel.selectedDevice?.name ?? "No device selected")
             .navigationDestination(for: AppRoute.self) { route in
                 switch route {
                     case .deviceDetails:
@@ -46,9 +45,18 @@ struct ContentView: View {
                         } else {
                             Text("No device selected")
                         }
+                    case .deviceList:
+                        DeviceListView(devices: viewModel.devices) { device in
+                            viewModel.selectDevice(device)
+                        }
                 }
             }
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Button(viewModel.selectedDevice?.name ?? "No device selected") {
+                        path.append(AppRoute.deviceList)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     deviceDetailsButton()
                 }
@@ -59,7 +67,6 @@ struct ContentView: View {
 
     private func deviceDetailsButton() -> some View {
         Button("Device Details", systemImage: "ellipsis") {
-            print("device details")
             path.append(AppRoute.deviceDetails)
         }
         .labelStyle(.iconOnly)

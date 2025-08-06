@@ -14,6 +14,7 @@ class BootUpViewModel: ObservableObject {
     private let dataService: DataService
     @Published var statusMessage: String = ""
     @Published var selectedDevice: Device?
+    private let selectedDeviceKey = "SelectedDeviceID"
 
     @Published var devices: [Device] = []
 
@@ -24,6 +25,11 @@ class BootUpViewModel: ObservableObject {
 
     func fetchDevices() {
         devices = dataService.retrieveDevices()
+
+        if let savedID = UserDefaults.standard.string(forKey: selectedDeviceKey),
+           let restoredDevice = devices.first(where: { $0.id.uuidString == savedID }) {
+            selectedDevice = restoredDevice
+        }
     }
 
     func addDevice(name: String, macAddress: String, broadcastIP: String) {
@@ -44,12 +50,17 @@ class BootUpViewModel: ObservableObject {
             print("No device selected")
             return
         }
-        dataService.updateDevice(device: device, name: macAddress, macAddress: macAddress, broadcastIP: broadcastIP)
+        dataService.updateDevice(device: device, name: name, macAddress: macAddress, broadcastIP: broadcastIP)
         fetchDevices()
     }
 
     func selectDevice(_ device: Device?) {
         selectedDevice = device
+        if let id = device?.id.uuidString {
+            UserDefaults.standard.set(id, forKey: selectedDeviceKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: selectedDeviceKey)
+        }
     }
 
     func bootDevice() {

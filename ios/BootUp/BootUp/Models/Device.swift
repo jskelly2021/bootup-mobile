@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-class Device: Identifiable {
+class Device: Identifiable, Hashable {
     var id: UUID
     var name: String
     var macAddress: String
